@@ -86,7 +86,13 @@ def handle_sleep_message(update: Update, context: CallbackContext):
         context: Контекст (память) бота
 
     """
-    update.message.reply_text('Пора спать!')
+    # Время последнего напоминания от бота автору сообщения
+    time = context.user_data.get('last_reminder_time')
+
+    # Напоминание по условию
+    if time is None or ((update.message.date - time).total_seconds() / 60) > 5:
+        context.user_data['last_reminder_time'] = datetime.now(timezone.utc)
+        update.message.reply_text('Пора спать!')
 
 
 # Настройка
