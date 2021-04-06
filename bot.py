@@ -71,6 +71,8 @@ def handle_message(update: Update, context: CallbackContext):
         if str(update.message.from_user.id) == config['OWNER']:
             if fresh and update.message.text == 'sleepy cat quit':
                 os.kill(os.getpid(), signal.SIGINT)
+            elif fresh and update.message.text == 'ping':
+                update.message.reply_text('pong')
 
         # Обработка событий в целевом канале
         if str(update.message.chat.id) == config['CHAT']:
