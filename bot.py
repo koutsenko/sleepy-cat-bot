@@ -67,15 +67,19 @@ def handle_message(update: Update, context: CallbackContext):
         utc_dt = update.message.date
         fresh = is_new_message(utc_dt)
 
+        # ID целевого канала и ID владельца
+        channel_id = context.bot_data['config']['CHAT']
+        owner_id = context.bot_data['config']['OWNER']
+
         # Обработка событий от себя
-        if str(update.message.from_user.id) == config['OWNER']:
+        if str(update.message.from_user.id) == owner_id:
             if fresh and update.message.text == 'sleepy cat quit':
                 os.kill(os.getpid(), signal.SIGINT)
             elif fresh and update.message.text == 'ping':
                 update.message.reply_text('pong')
 
         # Обработка событий в целевом канале
-        if str(update.message.chat.id) == config['CHAT']:
+        if str(update.message.chat.id) == channel_id:
             if fresh and is_night_message(utc_dt):
                 handle_sleep_message(update, context)
 
@@ -97,15 +101,23 @@ def handle_sleep_message(update: Update, context: CallbackContext):
         update.message.reply_text('Пора спать!')
 
 
-# Настройка
-config = dotenv_values('.env')
-logging.basicConfig(level=logging.NOTSET)
+def main():
+    """Точка входа."""
+    # Настройка
+    config = dotenv_values('.env')
+    logging.basicConfig(level=logging.NOTSET)
 
-# Инстанс бота и печать его основных свойств
-bot = Bot(token=config['TOKEN'])
-dump(bot.get_me().to_dict())
+    # Инстанс бота и печать его основных свойств
+    bot = Bot(token=config['TOKEN'])
+    dump(bot.get_me().to_dict())
 
-# Регистрация обработчика сообщений
-updater = Updater(token=config['TOKEN'])
-updater.dispatcher.add_handler(MessageHandler(Filters.all, handle_message))
-updater.start_polling()
+    # Регистрация обработчика сообщений
+    updater = Updater(token=config['TOKEN'])
+    updater.dispatcher.bot_data['config'] = config
+    updater.dispatcher.add_handler(MessageHandler(Filters.all, handle_message))
+    updater.start_polling()
+    updater.idle()
+
+
+if __name__ == '__main__':
+    main()
