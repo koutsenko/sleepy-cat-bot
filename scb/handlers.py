@@ -7,6 +7,7 @@ from telegram import CallbackQuery, Update
 from telegram.ext import CallbackContext
 
 from scb.checks import is_new_message, is_night_message
+from scb.google import add_row_to_sheet
 from scb.poll import build_keyboard, poll, stop_poll, update_polls, write_poll
 from scb.tools import pretty_print
 
@@ -26,9 +27,12 @@ def handle_message(update: Update, context: CallbackContext):
         if not is_new_message(update.message):
             return
 
+        # Конфиг
+        config = context.bot_data['config']
+
         # ID целевого канала и ID владельца
-        channel_id = context.bot_data['config']['CHAT']
-        owner_id = context.bot_data['config']['OWNER']
+        channel_id = config['CHAT']
+        owner_id = config['OWNER']
 
         # Обработка событий от себя
         if str(update.message.from_user.id) == owner_id:
@@ -43,6 +47,12 @@ def handle_message(update: Update, context: CallbackContext):
             elif update.message.text == 'debug context':
                 pretty_print(context.bot_data)
                 pretty_print(context.user_data)
+            elif update.message.text == 'check token':
+                sheet_id = config['SHEET_ID']
+                table_name = config['TABLE_TEST_NAME']
+                cells_range = 'A1:A'
+                row = ['проверочная строка']
+                add_row_to_sheet(sheet_id, cells_range, table_name, row)
 
         # Обработка событий в целевом канале
         if str(update.message.chat.id) == channel_id:
