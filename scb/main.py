@@ -17,7 +17,7 @@ def main():
     """Точка входа."""
     # Настройка
     config = dotenv_values('.env')
-    logging.basicConfig(level=logging.NOTSET)
+    logging.basicConfig(filename="bot.log", level=logging.NOTSET)
 
     # Инстанс бота и печать его основных свойств
     bot = Bot(token=config['TOKEN'])
