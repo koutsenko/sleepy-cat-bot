@@ -5,8 +5,25 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from telegram.ext import CallbackContext
 
 from scb.google import add_row_to_sheet
+from scb.today import build_today_message
 
-SCOPES = ('https://www.googleapis.com/auth/spreadsheets',)
+
+def smile(polls, index):
+    """Добавляет метку-смайлик к варианту опроса.
+
+    Parameters:
+        polls: Массив с результатами опроса
+        index: Индекс варианта результата
+
+    Returns:
+        Значение счетчика с соответствующим смайликом.
+    """
+    return [
+        f'😃 {polls[0]}',
+        f'😏 {polls[1]}',
+        f'😒 {polls[2]}',
+        f'😡 {polls[3]}',
+    ][index]
 
 
 def build_keyboard(polls):
@@ -19,10 +36,10 @@ def build_keyboard(polls):
         Конфигурация пристегнутой к сообщению панели с кнопками.
     """
     return InlineKeyboardMarkup([[
-        InlineKeyboardButton(text=f'😃 {polls[0]}', callback_data='5'),
-        InlineKeyboardButton(text=f'😏 {polls[1]}', callback_data='4'),
-        InlineKeyboardButton(text=f'😒 {polls[2]}', callback_data='3'),
-        InlineKeyboardButton(text=f'😡 {polls[3]}', callback_data='2'),
+        InlineKeyboardButton(text=smile(polls, 0), callback_data='5'),
+        InlineKeyboardButton(text=smile(polls, 1), callback_data='4'),
+        InlineKeyboardButton(text=smile(polls, 2), callback_data='3'),
+        InlineKeyboardButton(text=smile(polls, 3), callback_data='2'),
     ]])
 
 
@@ -35,15 +52,13 @@ def build_end_message(polls):
     Returns:
         Текст сообщения с текущими счетчиками и пожеланием хорошего дня.
     """
-    st = 'Статистика сна:\n'
-    sp = '   '
-    r5 = f'😃 {polls[0]}'
-    r4 = f'😏 {polls[1]}'
-    r3 = f'😒 {polls[2]}'
-    r2 = f'😡 {polls[3]}'
-    end = '\n\nХорошего дня!'
+    today = f'\n\n{build_today_message()}.'
+    wishes = '\nХорошего дня!'
+    stats_indexes = list(range(4))
+    stats_list = map(lambda index: smile(polls, index), stats_indexes)
+    stats = ' '.join(stats_list)
 
-    return f'{st}{r5}{sp}{r4}{sp}{r3}{sp}{r2}{end}'
+    return f'Статистика сна:\n{stats}{today}{wishes}'
 
 
 def update_polls(polls, answer):

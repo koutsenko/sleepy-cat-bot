@@ -6,8 +6,22 @@ import pytz
 from telegram import Message
 
 
+def is_old_message(message: Message, last_event_time):
+    """Проверка на старость сообщения (больше 5 минут с указанного момента).
+
+    Parameters:
+        message: Объект сообщения
+        last_event_time: Момент, с которого отмерять время
+
+    Returns:
+        False если сообщение достаточно старое и можно реагировать
+    """
+    delta = message.date - last_event_time
+    return (delta.total_seconds() / 60) > 5
+
+
 def is_new_message(message: Message):
-    """Проверка на свежесть сообщения.
+    """Проверка на свежесть сообщения (меньше минуты с текущего момента).
 
     Parameters:
         message: Объект сообщения
