@@ -87,9 +87,12 @@ def stop_poll(context: CallbackContext):
 
     """
     # TODO Проверка, что poll ранее состоялся
-    context.bot.edit_message_text(
+    context.bot.delete_message(
         chat_id=context.bot_data['poll_chat_id'],
         message_id=context.bot_data['poll_message_id'],
+    )
+    context.bot.send_message(
+        chat_id=context.bot_data['poll_chat_id'],
         text=build_end_message(context.bot_data['poll_counters']),
     )
     context.bot_data.update({

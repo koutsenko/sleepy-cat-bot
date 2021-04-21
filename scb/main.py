@@ -31,7 +31,7 @@ def main():
     jobs = [
         [22, 30, pray],
         [8, 30, poll],
-        [12, 00, stop_poll],
+        [10, 00, stop_poll],
     ]
     for job in jobs:
         job_time = make_time(job[0], job[1])
