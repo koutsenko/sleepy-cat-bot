@@ -4,6 +4,7 @@ import logging
 from dotenv import dotenv_values
 from telegram.ext import CallbackQueryHandler, Filters, MessageHandler, Updater
 
+from scb.defense import build_engine
 from scb.handlers import handle_message, handle_poll_answer
 from scb.poll import start_poll, stop_poll
 from scb.pray import pray
@@ -20,8 +21,9 @@ def main():
     # Фронтенд для telegram.Bot
     updater = Updater(token=config['TOKEN'])
 
-    # Инициализация контекста
+    # Сохранение настроек и движка чата в контексте данных бота
     updater.dispatcher.bot_data['config'] = config
+    updater.dispatcher.bot_data['talk_engine'] = build_engine()
 
     # Регистрация обработчика сообщений
     updater.dispatcher.add_handler(MessageHandler(Filters.all, handle_message))

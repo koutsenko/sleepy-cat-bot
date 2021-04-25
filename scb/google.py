@@ -32,6 +32,11 @@ def add_row_to_sheet(
         creds = Credentials.from_authorized_user_file('token.json', scopes)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
+        # FIXME Рефреш токен тоже может слетать, например каждые 7 дней если Google приложение не опубликовано.
+        # Наверное надо исправить это через заворачивание creds.refresh в try\except.
+        # Далее в эксепшене определить, если испорчен рефреш токен - заново сделать flow в браузере.
+        # Либо это какой-то фатал эррор, типа что-то совсем не то в учетке google - пишем автору в приват и вылетаем.    
+        # Все это надо тестить - завести дополнительную google учетку, скопировать и править этот код отдельно.
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:

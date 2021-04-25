@@ -3,6 +3,7 @@ from telegram import CallbackQuery, Update
 from telegram.ext import CallbackContext
 
 from scb.checks import is_new_message, is_night_message, is_old_message
+# from scb.defense import handle_offensive_message
 from scb.handlers_owner import handle_owner_message
 from scb.poll import build_keyboard, update_polls, write_poll
 from scb.tools_time import get_now_utc
@@ -92,6 +93,14 @@ def handle_sleep_message(update: Update, context: CallbackContext):
         context: Контекст (память) бота
 
     """
+    # Если кто-то гонит на бота бочку, сразу отвечаем
+    # defense_response = handle_offensive_message(
+    #     context.bot_data['talk_engine'],
+    #     update.message.text,
+    # )
+    # if defense_response:
+    #     update.message.reply_text(defense_response)
+
     # Время последнего напоминания от бота автору сообщения
     time = context.user_data.get('last_reminder_time')
 

@@ -5,6 +5,7 @@ import signal
 from telegram import Update
 from telegram.ext import CallbackContext
 
+from scb.defense import handle_offensive_message
 from scb.google import add_row_to_sheet
 from scb.poll import build_end_message, start_poll, stop_poll
 from scb.tools import pretty_print
@@ -37,8 +38,6 @@ def handle_owner_debug_message(update: Update, context: CallbackContext):
         update: Событие сообщения
         context: Контекст (память) бота
     """
-    sheet_id = context.bot_data['config']['SHEET_ID']
-    table_name = context.bot_data['config']['TABLE_TEST_NAME']
     text = update.message.text
 
     if text.startswith('debug poll '):
@@ -47,9 +46,19 @@ def handle_owner_debug_message(update: Update, context: CallbackContext):
         pretty_print(context.bot_data)
         pretty_print(context.user_data)
     elif text == 'debug google sheets write':
-        cells_range = 'A1:A'
-        row = ['проверочная строка']
-        add_row_to_sheet(sheet_id, cells_range, table_name, row)
+        add_row_to_sheet(
+            context.bot_data['config']['SHEET_ID'],
+            'A1:A',
+            context.bot_data['config']['TABLE_TEST_NAME'],
+            ['проверочная строка'],
+        )
+    else:
+        defense_response = handle_offensive_message(
+            context.bot_data['talk_engine'],
+            text[len('debug '):],
+        )
+        if defense_response:
+            update.message.reply_text(defense_response)
 
 
 def handle_owner_debug_poll_message(update: Update, context: CallbackContext):

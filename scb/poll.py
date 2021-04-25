@@ -17,7 +17,7 @@ def check_poll_is_running(context: CallbackContext):
     Returns:
         True если опрос запущен.
     """
-    return context.bot_data['poll_is_running'] is True
+    return context.bot_data.get('poll_is_running') is True
 
 
 def start_poll(context: CallbackContext):
