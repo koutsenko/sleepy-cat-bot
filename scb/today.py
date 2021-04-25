@@ -1,7 +1,5 @@
 """Утренняя инфа про сегодняшний день."""
-from datetime import datetime
-
-import pytz
+from scb.tools_time import get_week_day
 
 days = [
     'понедельник, день прокрастинации',
@@ -20,11 +18,6 @@ def build_today_message():
     Returns:
         Текст информации о сегодняшнем дне.
     """
-    day_local = datetime.utcnow().astimezone(tz=pytz.timezone('Europe/Moscow'))
-    weekday = day_local.today().weekday()
+    weekday = get_week_day()
 
     return f'Сегодня {days[weekday]}'
-
-
-if __name__ == '__main__':
-    print(build_today_message())

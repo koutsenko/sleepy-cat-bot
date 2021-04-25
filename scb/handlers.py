@@ -1,12 +1,11 @@
 """Обработка сообщений."""
-from datetime import datetime, timezone
-
 from telegram import CallbackQuery, Update
 from telegram.ext import CallbackContext
 
 from scb.checks import is_new_message, is_night_message, is_old_message
 from scb.handlers_owner import handle_owner_message
 from scb.poll import build_keyboard, update_polls, write_poll
+from scb.tools_time import get_now_utc
 
 
 def handle_message(update: Update, context: CallbackContext):
@@ -98,5 +97,5 @@ def handle_sleep_message(update: Update, context: CallbackContext):
 
     # Напоминание по условию
     if time is None or is_old_message(update.message, time):
-        context.user_data['last_reminder_time'] = datetime.now(timezone.utc)
+        context.user_data['last_reminder_time'] = get_now_utc()
         update.message.reply_text('Пора спать!')
