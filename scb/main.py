@@ -8,7 +8,7 @@ from scb.handlers import handle_message, handle_poll_answer
 from scb.poll import start_poll, stop_poll
 from scb.pray import pray
 from scb.tools import pretty_print
-from scb.tools_time import make_time
+from scb.tools_time import get_time
 
 
 def main():
@@ -34,7 +34,7 @@ def main():
         [10, 00, stop_poll],
     ]
     for job in jobs:
-        job_time = make_time(job[0], job[1])
+        job_time = get_time(job[0], job[1])
         updater.job_queue.run_daily(job[2], job_time)
 
     # Печать основных свойств бота

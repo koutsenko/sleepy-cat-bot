@@ -1,9 +1,9 @@
 """Матчинг сообщений."""
 import itertools
-from datetime import datetime, timezone
 
-import pytz
 from telegram import Message
+
+from scb.tools_time import get_hour_msk, get_seconds_diff
 
 
 def is_old_message(message: Message, last_event_time):
@@ -16,8 +16,7 @@ def is_old_message(message: Message, last_event_time):
     Returns:
         False если сообщение достаточно старое и можно реагировать
     """
-    delta = message.date - last_event_time
-    return (delta.total_seconds() / 60) > 5
+    return (get_seconds_diff(last_event_time, message.date) / 60) > 5
 
 
 def is_new_message(message: Message):
@@ -30,8 +29,7 @@ def is_new_message(message: Message):
         False если сообщение слишком старое и не требует реакции
 
     """
-    delta = datetime.now(timezone.utc) - message.date
-    return delta.total_seconds() <= 60
+    return get_seconds_diff(message.date) <= 60
 
 
 def is_night_message(message: Message):
@@ -44,6 +42,6 @@ def is_night_message(message: Message):
         True если сообщение ночное
 
     """
-    msk_dt = message.date.astimezone(tz=pytz.timezone('Europe/Moscow'))
+    hour = get_hour_msk(message.date)
     night = itertools.chain(range(22, 24), range(0, 6))  # noqa: WPS432
-    return msk_dt.hour in night
+    return hour in night
