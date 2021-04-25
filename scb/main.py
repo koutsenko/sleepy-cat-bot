@@ -5,7 +5,7 @@ from dotenv import dotenv_values
 from telegram.ext import CallbackQueryHandler, Filters, MessageHandler, Updater
 
 from scb.handlers import handle_message, handle_poll_answer
-from scb.poll import poll, stop_poll
+from scb.poll import start_poll, stop_poll
 from scb.pray import pray
 from scb.tools import pretty_print
 from scb.tools_time import make_time
@@ -30,7 +30,7 @@ def main():
     # Создание регулярных задач
     jobs = [
         [22, 30, pray],
-        [8, 30, poll],
+        [8, 30, start_poll],
         [10, 00, stop_poll],
     ]
     for job in jobs:

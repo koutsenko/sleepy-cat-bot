@@ -6,7 +6,7 @@ from telegram import Update
 from telegram.ext import CallbackContext
 
 from scb.google import add_row_to_sheet
-from scb.poll import build_end_message, poll, stop_poll
+from scb.poll import build_end_message, start_poll, stop_poll
 from scb.tools import pretty_print
 
 
@@ -62,7 +62,7 @@ def handle_owner_debug_poll_message(update: Update, context: CallbackContext):
     text = update.message.text
 
     if text == 'debug poll start':
-        poll(context)
+        start_poll(context)
     elif text == 'debug poll stop':
         stop_poll(context)
     elif text == 'debug poll stats print':

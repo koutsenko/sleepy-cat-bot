@@ -61,6 +61,29 @@ def build_end_message(polls):
     return f'Статистика сна:\n{stats}{today}{wishes}'
 
 
+def start_poll(context: CallbackContext):
+    """Вывод опроса в чат.
+
+    Parameters:
+        context: Контекст (память) бота
+
+    """
+    channel_id = context.bot_data['config']['CHAT']
+    polls = [0, 0, 0, 0]
+    keyboard = build_keyboard(polls)
+    question = 'Как спалось?'
+    message: Message = context.bot.send_message(
+        channel_id,
+        text=question,
+        reply_markup=keyboard,
+    )
+    context.bot_data.update({
+        'poll_counters': polls,
+        'poll_chat_id': message.chat_id,
+        'poll_message_id': message.message_id,
+    })
+
+
 def update_polls(polls, answer):
     """Обновление счетчика результатов в соответствии с ответом пользователя.
 
@@ -77,6 +100,28 @@ def update_polls(polls, answer):
         polls[2] + 1 if answer == '3' else polls[2],
         polls[3] + 1 if answer == '2' else polls[3],
     ]
+
+
+def write_poll(context: CallbackContext, user_id, user_name, answer):
+    """Запись результата в гугл таблицу.
+
+    Parameters:
+        context: Контекст (память) бота
+        user_id: ID пользователя
+        user_name: Полное имя пользователя
+        answer: Ответ пользователя
+
+    """
+    sheet_id = context.bot_data['config']['SHEET_ID']
+    table_name = context.bot_data['config']['TABLE_NAME']
+    cells_range = 'A2:E'
+    row = [
+        date.today().isoformat(),
+        user_id,
+        user_name,
+        answer,
+    ]
+    add_row_to_sheet(sheet_id, cells_range, table_name, row)
 
 
 def stop_poll(context: CallbackContext):
@@ -101,48 +146,3 @@ def stop_poll(context: CallbackContext):
         'poll_message_id': None,
         'poll_answered': None,
     })
-
-
-def poll(context: CallbackContext):
-    """Вывод опроса в чат.
-
-    Parameters:
-        context: Контекст (память) бота
-
-    """
-    channel_id = context.bot_data['config']['CHAT']
-    polls = [0, 0, 0, 0]
-    keyboard = build_keyboard(polls)
-    question = 'Как спалось?'
-    message: Message = context.bot.send_message(
-        channel_id,
-        text=question,
-        reply_markup=keyboard,
-    )
-    context.bot_data.update({
-        'poll_counters': polls,
-        'poll_chat_id': message.chat_id,
-        'poll_message_id': message.message_id,
-    })
-
-
-def write_poll(context: CallbackContext, user_id, user_name, answer):
-    """Запись результата в гугл таблицу.
-
-    Parameters:
-        context: Контекст (память) бота
-        user_id: ID пользователя
-        user_name: Полное имя пользователя
-        answer: Ответ пользователя
-
-    """
-    sheet_id = context.bot_data['config']['SHEET_ID']
-    table_name = context.bot_data['config']['TABLE_NAME']
-    cells_range = 'A2:E'
-    row = [
-        date.today().isoformat(),
-        user_id,
-        user_name,
-        answer,
-    ]
-    add_row_to_sheet(sheet_id, cells_range, table_name, row)
